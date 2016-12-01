@@ -17,13 +17,27 @@ let lexemeAsString lexbuf =
 
 let keyword s =
     match s with
-    | "local"  -> LOCAL
-    | "fun"   -> FUN
-    | "rec" -> REC
-    | "print"    -> PRINT
-	| "fn" -> FN
+	| "bool" -> BOOL
+	| "else" -> ELSE
 	| "end" -> END
+	| "false" -> FALSE
+	| "fn" -> FN
+	| "fun"   -> FUN
+	| "hd" -> HD
 	| "if" -> IF
+	| "in" -> IN
+	| "int" -> INT
+	| "ise" -> ISE
+	| "list" -> LIST
+	| "local" -> LOCAL
+	| "not" -> NOT
+	| "null" -> NULL
+	| "print"    -> PRINT
+    | "rec" -> REC
+	| "then" -> THEN
+	| "true" -> TRUE
+	| "unit" -> UNIT
+	| "var" -> VAR
     | _       -> NAME s
 }
 
