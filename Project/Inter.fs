@@ -42,7 +42,8 @@ eval e3 []
 
 let rec eval (e : expr) (env : value env) : value =
     match e with 
-    | (Con i, BoolT) -> if i=1 then Int 1 else Int 0
+    | (Con 0, BoolT) -> Int 0
+    | (Con 1, BoolT) -> Int 1
     | (Con i,_) -> Int i
     | (EListC,_) -> List []
     | (Var x,_)  -> lookup env x
@@ -68,7 +69,9 @@ let rec eval (e : expr) (env : value env) : value =
           | ("+", Int i1, Int i2) -> Int (i1 + i2)
           | ("-", Int i1, Int i2) -> Int (i1 - i2)
           | ("=", Int i1, Int i2) -> Int (if i1 = i2 then 1 else 0)
+          | ("<>", Int i1, Int i2) -> Int(if i1 = i2 then 0 else 1)
           | ("<", Int i1, Int i2) -> Int (if i1 < i2 then 1 else 0)
+          | ("<=", Int i1, Int i2) -> Int(if i1 <= i2 then 1 else 0)
           | _ -> failwith "unknown primitive or wrong type"
 
     | (If (e1, e2, e3),_) -> 
@@ -77,9 +80,10 @@ let rec eval (e : expr) (env : value env) : value =
       | Int _ -> eval e2 env
       | _     -> failwith "eval If"
 
-    | _ -> failwith "unknown Test Primitive"
+    //Everything below needs to be worked on
 
     | (Call (e1, e2),_) -> 
+    (*e1 = Name and Type of Function, e2 = Argument you are feeding the function*)
       let c = eval e1 env
       match c with
       | Closure (f, x, fbody, fenv) ->
@@ -87,6 +91,8 @@ let rec eval (e : expr) (env : value env) : value =
         let env1 = (x, v) :: (f, c) :: fenv in
         eval fbody env1
       | _ -> failwith "eval Call: not a function"
+
+    | _ -> failwith "unknown Test Primitive"
 
 
     (*| Prim (op, e1, e2) -> 
