@@ -32,15 +32,17 @@ and listToString l t =
   | v :: vs -> (toString v t) + "; " + (listToString vs t)
 
 
-
+let e1 = (Con 4, IntT)
+eval e1 []
 
 let rec eval (e : expr) (env : value env) : value =
     match e with
-    | Con i -> Int i
-    | EListC -> []
+    | (Con i, IntT) -> Int i
+   (* | EListC -> []
     | CstI i -> Int i
     | CstB b -> Int (if b then 1 else 0)
-
+    *)
+    | _ -> failwith "unkown"
     | Var x  -> lookup env x
 
     | Op1(op, e1) ->
@@ -53,7 +55,7 @@ let rec eval (e : expr) (env : value env) : value =
        let v1 = eval e1 env in
        let v2 = eval e2 env in
        match(op,v1,v2) with
-          | ("::", ListT i, ListT j) -> i :: j (*Not Correct, Holder*)
+          | ("::", Int i, ListT j) -> i :: j (*Not Correct, Holder*)
           | ("*", Int i1, Int i2) -> Int (i1 * i2)
           | ("/", Int i1, Int i2) -> Int (i1 / i2)
           | ("+", Int i1, Int i2) -> Int (i1 + i2)
