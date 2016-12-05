@@ -57,7 +57,7 @@ rule Token = parse
   | '('             { LPAR }
   | ')'             { RPAR }
   | '::'			{ APPEND }
-  |
+  | '->'			{ RETARROW }
   | eof             { EOF }
   | _               { failwith "Lexer error: illegal symbol" }
 

@@ -37,6 +37,7 @@ and listToString l t =
 let rec eval (e : expr) (env : value env) : value =
     match e with
     | Con i -> Int i
+    | EListC -> []
     | CstI i -> Int i
     | CstB b -> Int (if b then 1 else 0)
 
@@ -45,13 +46,14 @@ let rec eval (e : expr) (env : value env) : value =
     | Op1(op, e1) ->
         let v1 = eval e1 env in
         match(op, v1) with
-        | ("-", Int i1) -> Int -i1
+        | ("not", Int i1) -> Int -i1
         | _ -> failwith "unknown primitive or wrong type"
         
     | Op2(op, e1, e2) ->
        let v1 = eval e1 env in
        let v2 = eval e2 env in
        match(op,v1,v2) with
+          | ("::", ListT i, ListT j) -> i :: j (*Not Correct, Holder*)
           | ("*", Int i1, Int i2) -> Int (i1 * i2)
           | ("/", Int i1, Int i2) -> Int (i1 / i2)
           | ("+", Int i1, Int i2) -> Int (i1 + i2)
@@ -72,10 +74,16 @@ let rec eval (e : expr) (env : value env) : value =
       | ("<", Int i1, Int i2) -> Int (if i1 < i2 then 1 else 0)
       |  _ -> failwith "unknown primitive or wrong type"*)
 
-    | Let (x, e1, e2) -> 
+    (*| Let (x, e1, e2) -> 
       let v = eval e1 env in
       let env2 = (x, v) :: env in
-      eval e2 env2
+      eval e2 env2*)
+
+    (*Trying to figure out how to create the let for our Interpretor *)
+    | Let (x, e1) ->
+        match x with
+        | V(str, v1) -> v1 (* Holder values for now*)
+        | F(f,x,fbody,fenv) -> f
  
     | If (e1, e2, e3) -> 
       match eval e1 env with
