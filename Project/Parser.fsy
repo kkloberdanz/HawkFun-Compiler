@@ -1,23 +1,21 @@
 %{
- (* File Fun/FunPar.fsy 
-    Parser for micro-ML, a small functional language; one-argument functions.
-    P. Sestoft, 2009-10-19
-    C. Tinelli, 2016-10-19
+ (* File Parser.fsy 
+
   *)
 
  open Absyn;
 %}
 
-/* TODO: How to add RBRAK LBRAK FNASSIGN NAT ? */
+/* TODO: How to add RBRAK LBRAK LAM NAT ? */
 
 /* TODO: which tokens go where? */
 %token <int> CSTINT
 %token <string> NAME
 %token <bool> CSTBOOL 
 %token BOOL ELSE END FALSE FN FUN HD IF IN INT ISE LIST LOCAL NOT NULL PRINT REC THEN TRUE UNIT VAR
-%token RETARROW TL
+%token RETARROW TL LAM
 %token PLUS MINUS TIMES DIV
-%token EQ NE LT LTE DBLCOL SEMICOL COL
+%token EQ NE LT LTE APPEND SEMICOL COL
 %token LPAR RPAR 
 %token EOF
 
@@ -27,7 +25,7 @@
 %left ELSE              
 %left EQ NE 
 %nonassoc LT LTE
-%right DBLCOL
+%right APPEND
 %left PLUS MINUS
 %left TIMES DIV 
 %nonassoc NOT HD TL ISE LIST PRINT F /* TODO: How to handle F? What is TL? */
@@ -40,46 +38,46 @@
 %%
 
 Main:
-    Expr EOF                            { $1 }
+    Expr EOF                             { $1 }
 ;
 
 /* TODO: How to handle {} ? */
 Expr:
-    AtExpr                              { $1                      }
-  | AppExpr                             { $1                      }
-  | IF Expr THEN Expr ELSE Expr         { If ($2, $4, $6)         }
-  | NOT Expr                            {}
-  | HD  Expr                            {}
-  | TL  Expr                            {}
-  | ISE Expr                            {}
-  | PRINT Expr                          {}
-  | Expr PLUS    Expr                     { Prim ("+",  $1, $3)     }
-  | Expr MINUS   Expr                     { Prim ("-",  $1, $3)     }
-  | Expr TIMES   Expr                     { Prim ("*",  $1, $3)     }
-  | Expr DIV     Expr                     { Prim ("/",  $1, $3)     } 
-  | Expr EQ      Expr                     { Prim ("=",  $1, $3)     }
-  | Expr NE      Expr                     { Prim ("<>", $1, $3)     }
-  | Expr LT      Expr                     { Prim ("<",  $1, $3)     }
-  | Expr LTE     Expr                     { Prim ("<=",  $1, $3)     }
-  | Expr DBLCOL  Expr                     { Prim ("::",  $1, $3)     }
-  | Expr COL     Expr                     { Prim (";",  $1, $3)     }
+    AtExpr                                { $1                     }
+  | AppExpr                               { $1                     }
+  | IF Expr THEN Expr ELSE Expr           { (If ($2, $4, $6), AnyT)}
+  | NOT Expr                              {(Op1 ("not", $2), BoolT)}
+  | HD  Expr                              {(Op1 ("hd" , $2), AnyT) }
+  | TL  Expr                              {(Op1 ("tl" , $2), AnyT) }
+  | ISE Expr                              {(Op1 ("ise", $2), AnyT) }
+  | PRINT Expr                            {(Op1 ("print", $2), AnyT)}
+  | Expr PLUS    Expr                     {(Op2 ("+",  $1, $3), AnyT}
+  | Expr MINUS   Expr                     {(Op2 ("-",  $1, $3), AnyT}
+  | Expr TIMES   Expr                     {(Op2 ("*",  $1, $3), AnyT}
+  | Expr DIV     Expr                     {(Op2 ("/",  $1, $3), AnyT} 
+  | Expr EQ      Expr                     {(Op2 ("=",  $1, $3), AnyT}
+  | Expr NE      Expr                     {(Op2 ("<>", $1, $3), AnyT}
+  | Expr LT      Expr                     {(Op2 ("<",  $1, $3), AnyT}
+  | Expr LTE     Expr                     {(Op2 ("<=",  $1, $3), AnyT}
+  | Expr APPEND  Expr                     {(Op2 ("::",  $1, $3), AnyT}
+  | Expr SEMICOL Expr                     {(Op2 (";",  $1, $3), AnyT}
 ;
 
 /* TODO: What is this opperator? => */
 AtExpr:
     Const                               { $1                      }
-  | NAME                                { Var $1                  }
+  | NAME                                { Var ($1)                }
   | LOCAL Bindings in Expr END          {}
-  | FN TypedName FNASSIGN Expr END      { AssignFn ($2, $4)       }
+  | FN TypedName FNASSIGN Expr END      { Lam ($2, $4)            }
   | LPAR Expr RPAR                      { $2                      }
   | LPAR LBRAK RBRAK COL type RPAR      {}
 ;
 
 Const:
-    NAT                                     {}
-  | TRUE
-  | FALSE
-  | NULL
+    NAT                                 { Con   ($1)              }
+  | TRUE                                { (Con 1, BoolT)          }
+  | FALSE                               { BoolT ($1)              }
+  | NULL                                { UnitT ($1)              }
 ;
 
 Bindings:
@@ -88,7 +86,7 @@ Bindings:
 ;
 
 Binding:
-    VAR NAME EQ Expr                            { $4 } /* ? */
+    VAR NAME EQ Expr                            { Let (, $4) } /* ? */
     FUN NAME TypedName EQ Expr                  { AssignFun ($3, $5) }
     FUN REC NAME TypedName COL Type EQ Expr     { AssignRecFun ($4, $5, $7) }
 ;
