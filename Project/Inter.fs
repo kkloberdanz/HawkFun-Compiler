@@ -49,6 +49,7 @@ let rec eval (e : expr) (env : value env) : value =
     match e with 
     | (Con 0, BoolT) -> Int 0
     | (Con 1, BoolT) -> Int 1
+    | (Con 0, UnitT) -> Int 0 //need to fix
     | (Con i,_) -> Int i
     | (EListC,_) -> List []
     | (Var x,_)  -> lookup env x

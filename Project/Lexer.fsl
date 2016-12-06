@@ -58,6 +58,8 @@ rule Token = parse
   | ')'             { RPAR }
   | '::'			{ APPEND }
   | '=>'			{ ARROW }
+  | '<='			{ LESEQ }
+  | ';'				{ SEMICOL }
   | eof             { EOF }
   | _               { failwith "Lexer error: illegal symbol" }
 
