@@ -36,9 +36,14 @@ and listToString l t =
 let e1 = (Op2("<>",(Con 4, IntT),(Con 2, IntT)),IntT)
 let e2 = (EListC, IntT)
 let e3 = (Op1("tl",(Op2("::",(Con 2, IntT), (Op2("::",(Con 4, IntT),(Op2("::",(Con 7, IntT), (EListC, IntT)),IntT)),IntT)), IntT)),IntT)
+
+let e4 = (Let(V("G",(Op2("+",(Con 6,IntT),(Con 4,IntT)),IntT)),(Op2("+",(Var "G",IntT),(Con 4,IntT)),IntT)),IntT)
+
 eval e1 []
 eval e2 []
 eval e3 []
+
+eval e4 []
 
 let rec eval (e : expr) (env : value env) : value =
     match e with 
@@ -83,6 +88,33 @@ let rec eval (e : expr) (env : value env) : value =
 
     //Everything below needs to be worked on
 
+    (*| Let (x, e1, e2) -> 
+      let v = eval e1 env in
+      let env2 = (x, v) :: env in
+      eval e2 env2*)
+
+    (*Trying to figure out how to create the let for our Interpretor *)
+
+    | (Let (x, e1),_) ->
+        match x with
+        | V(str, v1) -> let v = eval v1 env in
+                            let env2 = (str,v) :: env in
+                               eval e1 env2
+        | F(f,(x,t),fbody,fenv) -> let env2 = (f, Closure(Some f,x,e1,env)) :: env in
+                                    eval e1 env2
+
+    | _ -> failwith "holder Primitives"
+
+    (*Need to go into office hours to see what Lam is supposed to do
+    | (Lam(x,e1),_) ->
+
+    *)
+   
+   (*
+    | Letfun (f, x, e1, e2) -> 
+      let env2 = (f, Closure(f, x, e1, env)) :: env in
+      eval e2 env2*)
+
     | (Call (e1, e2),_) -> 
     (*e1 = Name and Type of Function, e2 = Argument you are feeding the function*)
       let c = eval e1 env
@@ -96,26 +128,6 @@ let rec eval (e : expr) (env : value env) : value =
             let env1 = (x, v) :: ((string)f, c) :: fenv in
             eval fbody env1
       | _ -> failwith "eval Call: not a function"
-
-    (*| Let (x, e1, e2) -> 
-      let v = eval e1 env in
-      let env2 = (x, v) :: env in
-      eval e2 env2*)
-
-    (*Trying to figure out how to create the let for our Interpretor *)
-    | (Let (x, e1),_) ->
-        match x with
-        | V(str, v1) -> let v = eval v1 env in
-                            let env2 = (str,v) :: env in
-                               eval e1 env2
-        | F(f,x,fbody,fenv) -> let env2 = (f, Closure(Some f,x,e1,env)) :: env in
-                                eval e1 env2
-    | _ -> failwith "holder Primitives"
-   
-   (*
-    | Letfun (f, x, e1, e2) -> 
-      let env2 = (f, Closure(f, x, e1, env)) :: env in
-      eval e2 env2*)
 
 
 let run e = eval e []
