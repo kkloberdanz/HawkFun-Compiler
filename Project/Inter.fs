@@ -33,7 +33,7 @@ and listToString l t =
   | v :: vs -> (toString v t) + "; " + (listToString vs t)
 
 
-let e1 = (Con 2, BoolT)
+let e1 = (Op2("<>",(Con 4, IntT),(Con 2, IntT)),IntT)
 let e2 = (EListC, IntT)
 let e3 = (Op1("tl",(Op2("::",(Con 2, IntT), (Op2("::",(Con 4, IntT),(Op2("::",(Con 7, IntT), (EListC, IntT)),IntT)),IntT)), IntT)),IntT)
 eval e1 []
@@ -63,7 +63,7 @@ let rec eval (e : expr) (env : value env) : value =
        let v1 = eval e1 env in
        let v2 = eval e2 env in
        match(op,v1,v2) with
-          | ("::", Int i, List j) -> (List (Int i :: j)) (*Not Correct, Holder*)
+          | ("::", Int i, List j) -> (List (Int i :: j))
           | ("*", Int i1, Int i2) -> Int (i1 * i2)
           | ("/", Int i1, Int i2) -> Int (i1 / i2)
           | ("+", Int i1, Int i2) -> Int (i1 + i2)
@@ -80,6 +80,7 @@ let rec eval (e : expr) (env : value env) : value =
       | Int _ -> eval e2 env
       | _     -> failwith "eval If"
 
+
     //Everything below needs to be worked on
 
     | (Call (e1, e2),_) -> 
@@ -88,23 +89,13 @@ let rec eval (e : expr) (env : value env) : value =
       match c with
       | Closure (f, x, fbody, fenv) ->
         let v = eval e2 env in
-        let env1 = (x, v) :: (f, c) :: fenv in
-        eval fbody env1
+        if f = None then
+            let env1 = (x, v) :: ("", c) :: fenv in
+            eval fbody env1
+        else
+            let env1 = (x, v) :: ((string)f, c) :: fenv in
+            eval fbody env1
       | _ -> failwith "eval Call: not a function"
-
-    | _ -> failwith "unknown Test Primitive"
-
-
-    (*| Prim (op, e1, e2) -> 
-      let v1 = eval e1 env in
-      let v2 = eval e2 env in
-      match (op, v1, v2) with
-      | ("*", Int i1, Int i2) -> Int (i1 * i2)
-      | ("+", Int i1, Int i2) -> Int (i1 + i2)
-      | ("-", Int i1, Int i2) -> Int (i1 - i2)
-      | ("=", Int i1, Int i2) -> Int (if i1 = i2 then 1 else 0)
-      | ("<", Int i1, Int i2) -> Int (if i1 < i2 then 1 else 0)
-      |  _ -> failwith "unknown primitive or wrong type"*)
 
     (*| Let (x, e1, e2) -> 
       let v = eval e1 env in
@@ -112,14 +103,19 @@ let rec eval (e : expr) (env : value env) : value =
       eval e2 env2*)
 
     (*Trying to figure out how to create the let for our Interpretor *)
-    | Let (x, e1) ->
+    | (Let (x, e1),_) ->
         match x with
-        | V(str, v1) -> v1 (* Holder values for now*)
-        | F(f,x,fbody,fenv) -> f
-  
+        | V(str, v1) -> let v = eval v1 env in
+                            let env2 = (str,v) :: env in
+                               eval e1 env2
+        | F(f,x,fbody,fenv) -> let env2 = (f, Closure(Some f,x,e1,env)) :: env in
+                                eval e1 env2
+    | _ -> failwith "holder Primitives"
+   
+   (*
     | Letfun (f, x, e1, e2) -> 
       let env2 = (f, Closure(f, x, e1, env)) :: env in
-      eval e2 env2
+      eval e2 env2*)
 
 
 let run e = eval e []
