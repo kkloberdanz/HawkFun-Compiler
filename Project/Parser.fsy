@@ -13,14 +13,14 @@
 %token <string> NAME
 %token <bool> CSTBOOL 
 %token BOOL ELSE END FALSE FN FUN HD IF IN INT ISE LIST LOCAL NOT NULL PRINT REC THEN TRUE UNIT VAR
-%token RETARROW TL LAM
+%token TL LAM ARROW
 %token PLUS MINUS TIMES DIV
 %token EQ NE LT LTE APPEND SEMICOL COL
 %token LPAR RPAR 
 %token EOF
 
 /* lowest precedence  */
-%right SEMICOL RETARROW
+%right SEMICOL ARROW
 %nonassoc IF
 %left ELSE              
 %left EQ NE 
@@ -38,7 +38,7 @@
 %%
 
 Main:
-    Expr EOF                             { $1 }
+    Expr EOF                              { $1                     }
 ;
 
 /* TODO: How to handle {} ? */
@@ -64,41 +64,42 @@ Expr:
 ;
 
 /* TODO: What is this opperator? => */
+/* 'Let' is handled here */
 AtExpr:
     Const                               { $1                      }
-  | NAME                                { Var ($1)                }
-  | LOCAL Bindings in Expr END          {}
-  | FN TypedName FNASSIGN Expr END      { Lam ($2, $4)            }
+  | VAR NAME                            { Var ($2)                }
+  | LOCAL Bindings IN Expr END          { Let ($2, $4)}
+  | FN TypedName ARROW Expr END         { Lam ($2, $4)            }
   | LPAR Expr RPAR                      { $2                      }
   | LPAR LBRAK RBRAK COL type RPAR      {}
 ;
 
 Const:
-    NAT                                 { Con   ($1)              }
+    NAT                                 { (Con ($1), IntT)        }
   | TRUE                                { (Con 1, BoolT)          }
-  | FALSE                               { BoolT ($1)              }
-  | NULL                                { UnitT ($1)              }
+  | FALSE                               { (Con 0, BoolT)          }
+  | NULL                                { (Con 0, UnitT)          }
+;
+
+TypedName:
+    /*NAME*/
+  | Type
 ;
 
 Bindings:
-    binding                             {}
-  | binding binding                     {}
+    Binding Bindings                        { ($1, $2) }
+  | Binding                                 { $1 }
 ;
 
 Binding:
-    VAR NAME EQ Expr                            { Let (, $4) } /* ? */
-    FUN NAME TypedName EQ Expr                  { AssignFun ($3, $5) }
-    FUN REC NAME TypedName COL Type EQ Expr     { AssignRecFun ($4, $5, $7) }
+    VAR NAME EQ Expr                        { (V($2, $4), AnyT)  }
+    FUN NAME TypedName EQ Expr              { (V($2, $4), $3)  }
+    FUN REC NAME TypedName COL Type EQ Expr { (F($3, $4, $6, $8)), AnyT }
 ;
 
 AppExpr:
     AtExpr AtExpr                       { Call ($1, $2)           }
   | AppExpr AtExpr                      { Call ($1, $2)           }
-;
-
-Const:
-    CSTINT                              { CstI ($1)               }
-  | CSTBOOL                             { CstB ($1)               }
 ;
 
 Type:
