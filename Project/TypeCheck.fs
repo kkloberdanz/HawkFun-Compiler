@@ -22,22 +22,27 @@ let rec check (e : expr) (env : value env) : expr =
         | ("not", _) -> (Op1(op, check e1 env),BoolT)
         | ("ise", ListT j ) -> (Op1(op,check e1 env), BoolT)
         | ("hd", ListT j ) -> (Op1(op,check e1 env), j)
-        | ("tl", ListT j ) -> if j != AnyT then (Op1(op,check e1 env), x) else failwith "AnyT"
+        | ("tl", ListT j ) -> if j = AnyT then (Op1(op,check e1 env), x) else failwith "AnyT" //not right
         | ("print", _ ) -> (Op1(op, check e1 env), UnitT)
         | _ -> failwith "unknown primitive or wrong type"
     | (Op2(op, e1, e2),x) ->
        match(op,x) with
-          | ("::", _) -> Op2(op, check e1 evn, check e2 env, ListT x)
-          | ("*", _) -> Op2(op, check e1 evn, check e2 env, IntT)
-          | ("/", _) -> Op2(op, check e1 evn, check e2 env, IntT)
-          | ("+", _) -> Op2(op, check e1 evn, check e2 env, IntT)
-          | ("-", _) -> Op2(op, check e1 evn, check e2 env, IntT)
-          | ("=", _) -> Op2(op, check e1 evn, check e2 env, IntT)
-          | ("<>", _) -> Op2(op, check e1 evn, check e2 env, IntT)
-          | ("<", _) -> Op2(op, check e1 evn, check e2 env, BoolT)
-          | ("<=", _) -> Op2(op, check e1 evn, check e2 env, BoolT)
+          | ("::", _) -> (Op2(op, check e1 env, check e2 env), ListT x)
+          | ("*", _) -> (Op2(op, check e1 env, check e2 env), IntT)
+          | ("/", _) -> (Op2(op, check e1 env, check e2 env), IntT)
+          | ("+", _) -> (Op2(op, check e1 env, check e2 env), IntT)
+          | ("-", _) -> (Op2(op, check e1 env, check e2 env), IntT)
+          | ("=", _) -> (Op2(op, check e1 env, check e2 env), IntT)
+          | ("<>", _) -> (Op2(op, check e1 env, check e2 env), IntT)
+          | ("<", _) -> (Op2(op, check e1 env, check e2 env), BoolT)
+          | ("<=", _) -> (Op2(op, check e1 env, check e2 env), BoolT)
           | _ -> failwith "unknown primitive or wrong type"
 
+    | (If ((e1,j), (e2,y), (e3,p)),x) -> 
+      match j with
+      | BoolT -> if y = x then (If ((e1,j), (e2,y), (e3,p)), y) else failwith "not right"
+
+    | _ -> failwith "Holder Typecheckers"
 
 
 
