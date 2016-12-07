@@ -17,8 +17,26 @@ let rec check (e : expr) (env : value env) : expr =
     | (EListC, ListT IntT) ->  (EListC, ListT IntT)
     | (Var i, IntT) -> (Var i, IntT)
     | (Var i, BoolT) -> (Var i, BoolT)
-
-
+    | (Op1(op, e1),x) ->
+        match(op, x) with
+        | ("not", _) -> (Op1(op, check e1 env),BoolT)
+        | ("ise", ListT j ) -> (Op1(op,check e1 env), BoolT)
+        | ("hd", ListT j ) -> (Op1(op,check e1 env), j)
+        | ("tl", ListT j ) -> if j != AnyT then (Op1(op,check e1 env), x) else failwith "AnyT"
+        | ("print", _ ) -> (Op1(op, check e1 env), UnitT)
+        | _ -> failwith "unknown primitive or wrong type"
+    | (Op2(op, e1, e2),x) ->
+       match(op,x) with
+          | ("::", _) -> Op2(op, check e1 evn, check e2 env, ListT x)
+          | ("*", _) -> Op2(op, check e1 evn, check e2 env, IntT)
+          | ("/", _) -> Op2(op, check e1 evn, check e2 env, IntT)
+          | ("+", _) -> Op2(op, check e1 evn, check e2 env, IntT)
+          | ("-", _) -> Op2(op, check e1 evn, check e2 env, IntT)
+          | ("=", _) -> Op2(op, check e1 evn, check e2 env, IntT)
+          | ("<>", _) -> Op2(op, check e1 evn, check e2 env, IntT)
+          | ("<", _) -> Op2(op, check e1 evn, check e2 env, BoolT)
+          | ("<=", _) -> Op2(op, check e1 evn, check e2 env, BoolT)
+          | _ -> failwith "unknown primitive or wrong type"
 
 
 
