@@ -49,7 +49,7 @@ let rec eval (e : expr) (env : value env) : value =
     match e with 
     | (Con 0, BoolT) -> Int 0
     | (Con 1, BoolT) -> Int 1
-    | (Con 0, UnitT) -> Int 0 //need to fix
+    | (Con 0, UnitT) -> Int 0
     | (Con i,_) -> Int i
     | (EListC,_) -> List []
     | (Var x,_)  -> lookup env x
@@ -104,13 +104,10 @@ let rec eval (e : expr) (env : value env) : value =
         | F(f,(x,t),fbody,fenv) -> let env2 = (f, Closure(Some f,x,e1,env)) :: env in
                                     eval e1 env2
 
-    | _ -> failwith "holder Primitives"
+    (*Need to go into office hours to see what Lam is supposed to do*)
+    | (Lam((x,y),e1),_) ->
+        Closure(None,x,e1,env)
 
-    (*Need to go into office hours to see what Lam is supposed to do
-    | (Lam(x,e1),_) ->
-
-    *)
-   
    (*
     | Letfun (f, x, e1, e2) -> 
       let env2 = (f, Closure(f, x, e1, env)) :: env in
@@ -123,7 +120,7 @@ let rec eval (e : expr) (env : value env) : value =
       | Closure (f, x, fbody, fenv) ->
         let v = eval e2 env in
         if f = None then
-            let env1 = (x, v) :: ("", c) :: fenv in
+            let env1 = (x, v) :: ("None", c) :: fenv in
             eval fbody env1
         else
             let env1 = (x, v) :: ((string)f, c) :: fenv in
