@@ -7,26 +7,34 @@ open Absyn
 open Env
 
 
-let rec check (e : expr) (env : value env) : expr =
+let e1 = (Op1("not",((Con 0, BoolT))),AnyT)
+
+check e1 []
+
+
+let rec check (e : expr) (env : htype env) : expr =
     match e with
     | (Con 0, BoolT) -> (Con 0, BoolT)
     | (Con 1, BoolT) -> (Con 1, BoolT)
     | (Con 0, UnitT) -> (Con 0, UnitT)
     | (Con i, IntT) -> (Con i, IntT)
     | (EListC, x) -> (EListC, ListT x) //Idk if this is right
+    | (Var x, _) -> (Var x, lookup env x)
+
+    (*
     | (Var i, IntT) -> (Var i, IntT)
     | (Var i, BoolT) -> (Var i, BoolT)
     | (Var i, UnitT) -> (Var i, UnitT)
     | (Var i, ListT BoolT) -> (Var i, ListT BoolT)
     | (Var i, ListT IntT) -> (Var i, ListT IntT)
     | (Var i, ListT UnitT) -> (Var i, ListT UnitT)
-    | (Var i, Arrow(IntT, IntT))
-    | (Var i, Arrow(IntT, BoolT))
-    | (Var i, Arrow(BoolT, IntT))
-    | (Var i, Arrow(BoolT, BoolT))
-    | (Var i, Arrow(IntT, UnitT))
-    | (Var i, Arrow(UnitT, IntT))
-    | (Var i, Arrow(UnitT, UnitT))
+    | (Var i, ArrowT(IntT, IntT))
+    | (Var i, ArrowT(IntT, BoolT))
+    | (Var i, ArrowT(BoolT, IntT))
+    | (Var i, ArrowT(BoolT, BoolT))
+    | (Var i, ArrowT(IntT, UnitT))
+    | (Var i, ArrowT(UnitT, IntT))
+    | (Var i, ArrowT(UnitT, UnitT))   *)
 
     
     | (Op1(op, e1),x) ->
@@ -38,6 +46,7 @@ let rec check (e : expr) (env : value env) : expr =
         | ("tl", ListT j ) -> (Op1(op, (v1,t)), ListT j) 
         | ("print", _ ) -> (Op1(op, (v1,t)), UnitT)
         | _ -> failwith "unknown primitive or wrong type"
+
     | (Op2(op, e1, e2),x) ->
        let (v1, h) = check e1 env
        let (v2,j) = check e2 env
@@ -62,14 +71,26 @@ let rec check (e : expr) (env : value env) : expr =
             | BoolT -> if h = g then (If (e1, e2, e3), h) else failwith "not right"
             | _ -> failwith "first expression not BoolT"
 
-(* Need to do rules 1,6,9,10,11,12 for typechecking, then done
-    | (Let(x, e2), j) ->
-        let (v2,q) = check e2 env
-        match x with
-        | V(h,e1) -> let (v1,t) = check e1 env
-                        
-        | F(a,b,c,d) ->
-        *)
+(* Need to do rules 1,6,9,10,11,12 for typechecking, then done*)
+    | (Let(bind, e2), j) ->
+        //let (v2,q) = check e2 env
+        match bind with
+        | V(h,e1) -> let (v1,m) = check e1 env 
+                     let env2 = (h,m) :: env 
+                     let (v2,q) = check e2 env2
+                     (Let(bind, e2), q)
+                               
+        //Not sure about this, #10 on rules
+        | F(f,(x,t),fbody,fenv) -> let (hold, hd) = check fenv env
+                                   let env2 = (f, hd) :: env
+                                   let (v2,q) = check e2 env2
+                                   (Let(bind, e2), q)
+
+        
+    | (Lam((x,q),y),z) ->
+        let (v1, t1) = check y env
+        (Lam((x,q),y), ArrowT(q, t1))
+        
 
     | _ -> failwith "Holder Typecheckers"
 

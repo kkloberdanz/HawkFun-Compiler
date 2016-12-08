@@ -11,7 +11,7 @@ and expr1 =
   | Op2 of string * expr * expr
   | If of expr * expr * expr
   | Let of binding * expr //This is where we need to continue from
-  | Lam of tname * expr //what is this for?
+  | Lam of tname * expr 
   | Call of expr * expr
 and binding = 
   | V of string * expr //binding of variable

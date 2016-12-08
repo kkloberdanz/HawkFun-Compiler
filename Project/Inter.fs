@@ -50,7 +50,7 @@ let rec eval (e : expr) (env : value env) : value =
     | (Con 0, BoolT) -> Int 0
     | (Con 1, BoolT) -> Int 1
     | (Con 0, UnitT) -> Int 0
-    | (Con i,_) -> Int i
+    | (Con i, IntT) -> Int i
     | (EListC,_) -> List []
     | (Var x,_)  -> lookup env x
 
@@ -128,5 +128,6 @@ let rec eval (e : expr) (env : value env) : value =
             eval fbody env1
       | _ -> failwith "eval Call: not a function"
 
+    | _ -> failwith "Not an expression"
 
 let run e = eval e []
