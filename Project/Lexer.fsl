@@ -56,7 +56,7 @@ rule Token = parse
   | '/'             { DIV }                     
   | '('             { LPAR }
   | ')'             { RPAR }
-  | '::'			{ APPEND }
+  | "::"			{ APPEND }
   | '=>'			{ ARROW }
   | '<='			{ LESEQ }
   | ';'				{ SEMICOL }
