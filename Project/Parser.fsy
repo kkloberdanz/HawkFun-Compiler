@@ -6,9 +6,9 @@
  open Absyn;
 %}
 
-/* TODO: How to add RBRAK LBRAK LAM NAT ? */
+(* TODO: How to add RBRAK LBRAK LAM NAT ? *)
 
-/* TODO: which tokens go where? */
+(* TODO: which tokens go where? *)
 %token <int> CSTINT
 %token <string> NAME
 %token <bool> CSTBOOL 
@@ -19,7 +19,7 @@
 %token LPAR RPAR 
 %token EOF
 
-/* lowest precedence  */
+(* lowest precedence  *)
 %right SEMICOL ARROW
 %nonassoc IF
 %left ELSE              
@@ -28,8 +28,8 @@
 %right APPEND
 %left PLUS MINUS
 %left TIMES DIV 
-%nonassoc NOT HD TL ISE LIST PRINT F /* TODO: How to handle F? What is TL? */
-/* highest precedence  */
+%nonassoc NOT HD TL ISE LIST PRINT F (* TODO: How to handle F? What is TL? *)
+(* highest precedence  *)
 
 %start Main
 %type <Absyn.expr> Main Expr AtExpr Const
@@ -41,7 +41,7 @@ Main:
     Expr EOF                              { $1                     }
 ;
 
-/* TODO: How to handle {} ? */
+(* TODO: How to handle {} ? *)
 Expr:
     AtExpr                                { $1                     }
   | AppExpr                               { $1                     }
@@ -63,8 +63,8 @@ Expr:
   | Expr SEMICOL Expr                     {(Op2 (";",  $1, $3), AnyT)}
 ;
 
-/* TODO: What is this opperator? => */
-/* 'Let' is handled here */
+(* TODO: What is this opperator? => *)
+(* 'Let' is handled here *)
 AtExpr:
     Const                               { $1                      }
   | NAME                                { Var ($2)                }
