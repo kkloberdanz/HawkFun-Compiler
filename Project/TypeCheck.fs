@@ -9,8 +9,10 @@ open Env
 
 let e1 = (Op1("not",((Con 0, BoolT))),AnyT)
 
-check e1 []
+let e2 = (If((Op1("not",((Con 0, BoolT))),AnyT),(Con 5, IntT) , (Con 1, IntT)) , AnyT)
 
+check e1 []
+check e2 []
 
 let rec check (e : expr) (env : htype env) : expr =
     match e with
@@ -68,7 +70,7 @@ let rec check (e : expr) (env : htype env) : expr =
         let (v2,h) = check e2 env
         let (v3,g) = check e3 env
         match j with
-            | BoolT -> if h = g then (If (e1, e2, e3), h) else failwith "not right"
+            | BoolT -> if h = g then (If ((v1,j), (v2,h), (v3,g)), h) else failwith "MisMatched types"
             | _ -> failwith "first expression not BoolT"
 
 (* Need to do rules 1,6,9,10,11,12 for typechecking, then done*)
