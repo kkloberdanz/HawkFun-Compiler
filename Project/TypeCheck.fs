@@ -80,19 +80,28 @@ let rec check (e : expr) (env : htype env) : expr =
         | V(h,e1) -> let (v1,m) = check e1 env 
                      let env2 = (h,m) :: env 
                      let (v2,q) = check e2 env2
-                     (Let(bind, e2), q)
+                     (Let(bind, (v2,q)), q)
                                
         //Not sure about this, #10 on rules
         | F(f,(x,t),fbody,fenv) -> let (hold, hd) = check fenv env
                                    let env2 = (f, hd) :: env
                                    let (v2,q) = check e2 env2
-                                   (Let(bind, e2), q)
+                                   (Let(bind, (v2,q)), q)
 
         
     | (Lam((x,q),y),z) ->
         let (v1, t1) = check y env
-        (Lam((x,q),y), ArrowT(q, t1))
+        (Lam((x,q),(v1,t1)), ArrowT(q, t1))
         
+
+    | (Call(e1,e2),k) ->
+        let (v1,z1) = check e2 env
+        let (v2,ArrowT(m,n)) = check e1 env
+        match z1 with
+           | m -> (Call( (v1,z1) , (v2,ArrowT(m,n)) ),m)
+           | _ -> failwith "Mismatched call types"
+        
+
 
     | _ -> failwith "Holder Typecheckers"
 
