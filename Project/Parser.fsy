@@ -92,7 +92,7 @@ Bindings:
 
 Binding:
     VAR NAME EQ Expr                        { (V($2, $4), AnyT)  }
-    FUN NAME TypedName EQ Expr              { (V($2, $4), $3)  }
+    FUN NAME TypedName EQ Expr              { (V($2, $4), AnyT)  }
     FUN REC NAME TypedName COL Type EQ Expr { (F($3, $4, $6, $8)), AnyT }
 ;
 
