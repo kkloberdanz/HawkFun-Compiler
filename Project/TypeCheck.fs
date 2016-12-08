@@ -13,34 +13,63 @@ let rec check (e : expr) (env : value env) : expr =
     | (Con 1, BoolT) -> (Con 1, BoolT)
     | (Con 0, UnitT) -> (Con 0, UnitT)
     | (Con i, IntT) -> (Con i, IntT)
-    | (EListC, ListT BoolT) -> (EListC, ListT BoolT)
-    | (EListC, ListT IntT) ->  (EListC, ListT IntT)
+    | (EListC, x) -> (EListC, ListT x) //Idk if this is right
     | (Var i, IntT) -> (Var i, IntT)
     | (Var i, BoolT) -> (Var i, BoolT)
+    | (Var i, UnitT) -> (Var i, UnitT)
+    | (Var i, ListT BoolT) -> (Var i, ListT BoolT)
+    | (Var i, ListT IntT) -> (Var i, ListT IntT)
+    | (Var i, ListT UnitT) -> (Var i, ListT UnitT)
+    | (Var i, Arrow(IntT, IntT))
+    | (Var i, Arrow(IntT, BoolT))
+    | (Var i, Arrow(BoolT, IntT))
+    | (Var i, Arrow(BoolT, BoolT))
+    | (Var i, Arrow(IntT, UnitT))
+    | (Var i, Arrow(UnitT, IntT))
+    | (Var i, Arrow(UnitT, UnitT))
+
+    
     | (Op1(op, e1),x) ->
-        match(op, x) with
-        | ("not", _) -> (Op1(op, check e1 env),BoolT)
-        | ("ise", ListT j ) -> (Op1(op,check e1 env), BoolT)
-        | ("hd", ListT j ) -> (Op1(op,check e1 env), j)
-        | ("tl", ListT j ) -> if j = AnyT then (Op1(op,check e1 env), x) else failwith "AnyT" //not right
-        | ("print", _ ) -> (Op1(op, check e1 env), UnitT)
+        let (v1,t) = check e1 env
+        match(op, t) with
+        | ("not", BoolT ) -> (Op1(op, (v1,t)),BoolT)
+        | ("ise", ListT j ) -> (Op1(op, (v1,t)), BoolT)
+        | ("hd", ListT j ) -> (Op1(op, (v1,t)), j)
+        | ("tl", ListT j ) -> (Op1(op, (v1,t)), ListT j) 
+        | ("print", _ ) -> (Op1(op, (v1,t)), UnitT)
         | _ -> failwith "unknown primitive or wrong type"
     | (Op2(op, e1, e2),x) ->
-       match(op,x) with
-          | ("::", _) -> (Op2(op, check e1 env, check e2 env), ListT x)
-          | ("*", _) -> (Op2(op, check e1 env, check e2 env), IntT)
-          | ("/", _) -> (Op2(op, check e1 env, check e2 env), IntT)
-          | ("+", _) -> (Op2(op, check e1 env, check e2 env), IntT)
-          | ("-", _) -> (Op2(op, check e1 env, check e2 env), IntT)
-          | ("=", _) -> (Op2(op, check e1 env, check e2 env), IntT)
-          | ("<>", _) -> (Op2(op, check e1 env, check e2 env), IntT)
-          | ("<", _) -> (Op2(op, check e1 env, check e2 env), BoolT)
-          | ("<=", _) -> (Op2(op, check e1 env, check e2 env), BoolT)
+       let (v1, h) = check e1 env
+       let (v2,j) = check e2 env
+       match(op, h, j) with
+          | ("::", h, ListT q) -> if h=q then (Op2(op, (v1,h), (v2,j)), ListT h) else failwith "Mismatched types"
+          | (";", h, j) -> (Op2(op, (v1,h), (v2,j)), j)
+          | ("*", IntT, IntT) -> (Op2(op, (v1,h), (v2,j)), IntT)
+          | ("/", IntT, IntT) -> (Op2(op, (v1,h), (v2,j)), IntT)
+          | ("+", IntT, IntT) -> (Op2(op, (v1,h), (v2,j)), IntT)
+          | ("-", IntT, IntT) -> (Op2(op, (v1,h), (v2,j)), IntT)
+          | ("=", _ , _) -> if h=j then (Op2(op, (v1,h), (v2,j)), BoolT) else failwith "Not equal types"
+          | ("<>", _, _) -> if h=j then (Op2(op, (v1,h) , (v2,j)), BoolT) else failwith "Not equal types"
+          | ("<", IntT,IntT) -> (Op2(op, (v1,h), (v2,j)), BoolT)
+          | ("<=", IntT, IntT) -> (Op2(op, (v1,h), (v2,j)), BoolT)
           | _ -> failwith "unknown primitive or wrong type"
 
-    | (If ((e1,j), (e2,y), (e3,p)),x) -> 
-      match j with
-      | BoolT -> if y = x then (If ((e1,j), (e2,y), (e3,p)), y) else failwith "not right"
+    | (If (e1, e2, e3),x) -> 
+        let (v1,j) = check e1 env
+        let (v2,h) = check e2 env
+        let (v3,g) = check e3 env
+        match j with
+            | BoolT -> if h = g then (If (e1, e2, e3), h) else failwith "not right"
+            | _ -> failwith "first expression not BoolT"
+
+(* Need to do rules 1,6,9,10,11,12 for typechecking, then done
+    | (Let(x, e2), j) ->
+        let (v2,q) = check e2 env
+        match x with
+        | V(h,e1) -> let (v1,t) = check e1 env
+                        
+        | F(a,b,c,d) ->
+        *)
 
     | _ -> failwith "Holder Typecheckers"
 

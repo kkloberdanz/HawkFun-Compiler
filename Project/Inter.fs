@@ -70,6 +70,7 @@ let rec eval (e : expr) (env : value env) : value =
        let v2 = eval e2 env in
        match(op,v1,v2) with
           | ("::", Int i, List j) -> (List (Int i :: j))
+          | (";", _, _) -> v2
           | ("*", Int i1, Int i2) -> Int (i1 * i2)
           | ("/", Int i1, Int i2) -> Int (i1 / i2)
           | ("+", Int i1, Int i2) -> Int (i1 + i2)
