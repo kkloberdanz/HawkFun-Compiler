@@ -13,7 +13,17 @@ let e2 = (If((Op1("not",((Con 0, BoolT))),AnyT),(Con 5, IntT) , (Con 1, IntT)) ,
 
 let e3 = (Let(V("G",(Op2("+",(Con 6,IntT),(Con 4,IntT)),AnyT)),(Op2("+",(Var "G",AnyT),(Con 4,IntT)),AnyT)),AnyT)
 
-let e4 = (Let (V ("x", (Con 0, BoolT)), (Op1 ("not", (Var "x", AnyT)), AnyT)), AnyT)//e5 should faillet e5 = (Let (V ("x", (Con 0, BoolT)) ,(Op2 ("*", (Con 2, IntT), (Var "x", AnyT)), AnyT)), AnyT)let e6 = (Let (V ("f", (Lam (("x", IntT), (Var "x", IntT)), AnyT)), (Call ((Var "f", AnyT), (Con 1, IntT)), AnyT)), AnyT)
+let e4 = (Let (V ("x", (Con 0, BoolT)), (Op1 ("not", (Var "x", AnyT)), AnyT)), AnyT)
+
+//e5 should fail
+let e5 = (Let (V ("x", (Con 0, BoolT)) ,(Op2 ("*", (Con 2, IntT), (Var "x", AnyT)), AnyT)), AnyT)
+
+
+
+let e6 = (Let (V ("f", (Lam (("x", IntT), (Var "x", IntT)), AnyT)), (Call ((Var "f", AnyT), (Con 1, IntT)), AnyT)), AnyT)
+
+
+
 
 check e1 []
 check e2 []
