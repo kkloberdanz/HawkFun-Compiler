@@ -5,6 +5,7 @@ module Inter
 
 open Absyn
 open Env
+open TypeCheck
 
 
 (* A runtime value is an integer, a list, or a function closure *)
@@ -43,12 +44,15 @@ let e5 = (Op2 ("::",(Con 1, IntT), (Op2 ("::",(Op2 ("+",(Con 1, IntT),(Con 2, In
 
 let e6 = (Let (V ("f", (Lam (("x", IntT), (Var "x", IntT)), AnyT)), (Call ((Var "f", AnyT), (Con 1, IntT)), AnyT)), AnyT)
 
+let e7 = (Op1("print",(Con 1, BoolT)),IntT)
+
 eval e1 []
 eval e2 []
 eval e3 []
 eval e4 []
 eval e5 []
 eval e6 []
+eval e7 []
 
 let rec eval (e : expr) (env : value env) : value =
     match e with 
@@ -60,13 +64,17 @@ let rec eval (e : expr) (env : value env) : value =
     | (Var x,_)  -> lookup env x
 
     | (Op1(op, e1),j) ->
+        let (c1, type1) = check e1 [] in //need this for print statement
         let v1 = eval e1 env in
         match(op, v1) with
         | ("not", Int i1) -> Int -i1
         | ("ise", List i1) -> if i1=[] then Int 1 else Int 0
         | ("hd", List (h::t)) -> List [h]
         | ("tl", List (h::t)) -> List t
-        | ("print", _) -> (toString (v1, j)) ; Int 0
+        | ("print", _) -> let hold = Printf.TextWriterFormat<unit>((toString v1 type1))
+                          printfn(hold) ; Int 0
+                            //let f = Printf.TextWriterFormat<unit>((toString v1 type1)) printfn f
+                            
         | _ -> failwith "unknown primitive or wrong type"
         
     | (Op2(op, e1, e2),_) ->
