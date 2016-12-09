@@ -33,7 +33,10 @@
 /* highest precedence  */
 
 %start Main
-%type <Absyn.expr> Main Expr AtExpr Const TypedName Bindings Type
+%type <Absyn.expr> Main Expr AtExpr Const
+%type<Absyn.binding> Bindings
+%type<Absyn.tname> TypedName
+%type<Absyn.htype> Type
 %type <Absyn.expr> AppExpr
 
 %%
@@ -68,7 +71,7 @@ Expr:
 /* 'Let' is handled here */
 AtExpr:
 	Const								  { $1                      }
-	| VAR NAME                            { (Var ($2), AnyT)        }
+	| NAME                                { (Var ($1), AnyT)        }
 	| LOCAL Bindings IN Expr END          { (Let ($2, $4), AnyT)    }
 	| FN TypedName ARROW Expr END         { (Lam ($2, $4), AnyT)    }
 	| LPAR Expr RPAR                      { $2                      }

@@ -44,6 +44,9 @@ let eval = Inter.eval
 let run = Inter.run
 //let crun e = run (check e)
 
+
+
+//Something isn't checking in TypeChecker,need to look into
 let ex = fromString "
   local var x = false in 2 * x end
 "
@@ -51,11 +54,17 @@ let tester = fromString " ([]:int list)"
 
 check ex
 
+run ex
 
 check (fromString "fn (x:int) => x end")
 
 check (fromString "local fun f (x:int) = x in (f 1) end")
-check (fromString "local var f = fn (x:int) => x end in (f 1) end")
+let tester = fromString "local var f = fn (x:int) => x end in (f 1) end"
+
+check tester
+
+run tester
+
 check (fromString "
   local fun rec f (x:int) : bool = f (x - 1) in f 2 end
 ")
@@ -194,6 +203,7 @@ let ex = fromString "
 "
 
 check ex
+run ex
 
 let ex = fromString "
 4 ; true

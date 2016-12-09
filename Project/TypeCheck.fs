@@ -7,7 +7,7 @@ open Absyn
 open Env
 
 
-let e1 = (Op1("not",((Con 0, BoolT))),AnyT)
+let e1 = (Op1("not", (Con 0, BoolT)),AnyT)
 
 let e2 = (If((Op1("not",((Con 0, BoolT))),AnyT),(Con 5, IntT) , (Con 1, IntT)) , AnyT)
 
