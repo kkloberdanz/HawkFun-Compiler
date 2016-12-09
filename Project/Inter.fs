@@ -59,15 +59,14 @@ let rec eval (e : expr) (env : value env) : value =
     | (EListC,_) -> List []
     | (Var x,_)  -> lookup env x
 
-    | (Op1(op, e1),_) ->
+    | (Op1(op, e1),j) ->
         let v1 = eval e1 env in
         match(op, v1) with
         | ("not", Int i1) -> Int -i1
         | ("ise", List i1) -> if i1=[] then Int 1 else Int 0
         | ("hd", List (h::t)) -> List [h]
         | ("tl", List (h::t)) -> List t
-        (*| ("null", UnitT) ->
-        | ("print", _) -> *)
+        | ("print", _) -> (toString (v1, j)) ; Int 0
         | _ -> failwith "unknown primitive or wrong type"
         
     | (Op2(op, e1, e2),_) ->
