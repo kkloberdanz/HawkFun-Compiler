@@ -16,7 +16,7 @@
 %token TL LAM ARROW
 %token PLUS MINUS TIMES DIV
 %token EQ NE LT LTE APPEND SEMICOL COL
-%token LPAR RPAR 
+%token LPAR RPAR RBRAK LBRAK
 %token EOF
 
 /* lowest precedence  */
@@ -71,11 +71,11 @@ AtExpr:
   | LOCAL Bindings IN Expr END          { Let ($2, $4)}
   | FN TypedName ARROW Expr END         { Lam ($2, $4)            }
   | LPAR Expr RPAR                      { $2                      }
-  | LPAR LBRAK RBRAK COL type RPAR      { (ListT ($5), AnyT)}
+  | LPAR LBRAK RBRAK COL Type RPAR      { (ListT ($5), AnyT)}
 ;
 
 Const:
-    NAT                                 { (Con ($1), IntT)        }
+    CSTINT                              { (Con ($1), IntT)        }
   | TRUE                                { (Con 1, BoolT)          }
   | FALSE                               { (Con 0, BoolT)          }
   | NULL                                { (Con 0, UnitT)          }
@@ -91,9 +91,9 @@ Bindings:
 ;
 
 Binding:
-    VAR NAME EQ Expr                        { (V($2, $4), AnyT)  }
-    FUN NAME TypedName EQ Expr              { (V($2, $5), AnyT)  }
-    FUN REC NAME TypedName COL Type EQ Expr { (F($3, $4, $6, $8)), AnyT }
+    VAR NAME EQ Expr                        { (V($2, $4), AnyT)  		}
+  | FUN NAME TypedName EQ Expr              { (V($2, $5), $3)  			}
+  | FUN REC NAME TypedName COL Type EQ Expr { (F($3, $4, $6, $8)), AnyT }
 ;
 
 AppExpr:
