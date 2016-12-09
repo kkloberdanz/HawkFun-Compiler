@@ -25,12 +25,12 @@ let e6 = (Let (V ("f", (Lam (("x", IntT), (Var "x", IntT)), AnyT)), (Call ((Var 
 
 
 
-check e1 []
+(*check e1 []
 check e2 []
 check e3 []
 check e4 []
 check e5 []
-check e6 []
+check e6 []*)
 
 let rec check (e : expr) (env : htype env) : expr =
     match e with

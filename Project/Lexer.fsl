@@ -3,6 +3,9 @@
     Lexer for a simple functional language (micro-ML) 
     P. Sestoft, 2009-10-19
     C. Tinelli, 2016-10-19
+
+
+	  | "::"			{ APPEND } 
   *)
 
 module Lexer
@@ -53,12 +56,14 @@ rule Token = parse
   | '+'             { PLUS }                     
   | '-'             { MINUS }                     
   | '*'             { TIMES }                     
-  | '/'             { DIV }                     
+  | '/'             { DIV }   
+  | ':'				{ COL }                  
   | '('             { LPAR }
   | ')'             { RPAR }
-  | "::"			{ APPEND }
   | "=>"			{ ARROW }
-  | "<="			{ LESEQ }
+  | "<="			{ LTE }
+  | '['				{ LBRAK }
+  | ']'				{ RBRAK }
   | ';'				{ SEMICOL }
   | eof             { EOF }
   | _               { failwith "Lexer error: illegal symbol" }

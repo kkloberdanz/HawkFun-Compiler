@@ -8,6 +8,23 @@
 
 *)
 
+#r "System.Drawing.dll"
+#r "System.Windows.Forms.dll"
+
+
+// Windows only
+#r "C:\Users\Max\Documents\GitHub\HawkFun-Compiler\Project\\bin\FsLexYacc.Runtime.dll"
+#load "C:\Users\Max\Documents\GitHub\HawkFun-Compiler\Project\Absyn.fs" 
+#load "C:\Users\Max\Documents\GitHub\HawkFun-Compiler\Project\Parser.fs"
+#load "C:\Users\Max\Documents\GitHub\HawkFun-Compiler\Project\Lexer.fs" 
+#load "C:\Users\Max\Documents\GitHub\HawkFun-Compiler\Project\Parse.fs"
+#load "C:\Users\Max\Documents\GitHub\HawkFun-Compiler\Project\Env.fs"
+#load "C:\Users\Max\Documents\GitHub\HawkFun-Compiler\Project\TypeCheck.fs" 
+#load "C:\Users\Max\Documents\GitHub\HawkFun-Compiler\Project\Inter.fs" 
+
+
+
+
 // Mac Os
    #r "/Users/tinelli/Desktop/Project/bin/FsLexYacc.Runtime.dll"
    #load "/Users/tinelli/Desktop/Project/Absyn.fs" 
@@ -25,11 +42,12 @@ let fromString = Parse.fromString
 let check = TypeCheck.check
 let eval = Inter.eval
 let run = Inter.run
-let crun e = run (check e)
+//let crun e = run (check e)
 
 let ex = fromString "
   local var x = false in 2 * x end
 "
+let tester = fromString " ([]:int list)"
 
 check ex
 

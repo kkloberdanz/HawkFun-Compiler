@@ -46,13 +46,13 @@ let e6 = (Let (V ("f", (Lam (("x", IntT), (Var "x", IntT)), AnyT)), (Call ((Var 
 
 let e7 = (Op1("print",(Con 1, BoolT)),IntT)
 
-eval e1 []
+(*eval e1 []
 eval e2 []
 eval e3 []
 eval e4 []
 eval e5 []
 eval e6 []
-eval e7 []
+eval e7 []*)
 
 let rec eval (e : expr) (env : value env) : value =
     match e with 
