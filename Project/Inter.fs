@@ -39,11 +39,16 @@ let e3 = (Op1("tl",(Op2("::",(Con 2, IntT), (Op2("::",(Con 4, IntT),(Op2("::",(C
 
 let e4 = (Let(V("G",(Op2("+",(Con 6,IntT),(Con 4,IntT)),IntT)),(Op2("+",(Var "G",IntT),(Con 4,IntT)),IntT)),IntT)
 
+let e5 = (Op2 ("::",(Con 1, IntT), (Op2 ("::",(Op2 ("+",(Con 1, IntT),(Con 2, IntT)), IntT), (EListC, ListT IntT)), ListT IntT)), ListT IntT)
+
+let e6 = (Let (V ("f", (Lam (("x", IntT), (Var "x", IntT)), AnyT)), (Call ((Var "f", AnyT), (Con 1, IntT)), AnyT)), AnyT)
+
 eval e1 []
 eval e2 []
 eval e3 []
-
 eval e4 []
+eval e5 []
+eval e6 []
 
 let rec eval (e : expr) (env : value env) : value =
     match e with 

@@ -11,8 +11,16 @@ let e1 = (Op1("not",((Con 0, BoolT))),AnyT)
 
 let e2 = (If((Op1("not",((Con 0, BoolT))),AnyT),(Con 5, IntT) , (Con 1, IntT)) , AnyT)
 
+let e3 = (Let(V("G",(Op2("+",(Con 6,IntT),(Con 4,IntT)),AnyT)),(Op2("+",(Var "G",AnyT),(Con 4,IntT)),AnyT)),AnyT)
+
+let e4 = (Let (V ("x", (Con 0, BoolT)), (Op1 ("not", (Var "x", AnyT)), AnyT)), AnyT)//e5 should faillet e5 = (Let (V ("x", (Con 0, BoolT)) ,(Op2 ("*", (Con 2, IntT), (Var "x", AnyT)), AnyT)), AnyT)let e6 = (Let (V ("f", (Lam (("x", IntT), (Var "x", IntT)), AnyT)), (Call ((Var "f", AnyT), (Con 1, IntT)), AnyT)), AnyT)
+
 check e1 []
 check e2 []
+check e3 []
+check e4 []
+check e5 []
+check e6 []
 
 let rec check (e : expr) (env : htype env) : expr =
     match e with
@@ -20,7 +28,7 @@ let rec check (e : expr) (env : htype env) : expr =
     | (Con 1, BoolT) -> (Con 1, BoolT)
     | (Con 0, UnitT) -> (Con 0, UnitT)
     | (Con i, IntT) -> (Con i, IntT)
-    | (EListC, x) -> (EListC, ListT x) //Idk if this is right
+    | (EListC, ListT x) -> (EListC, ListT x) //Idk if this is right
     | (Var x, _) -> (Var x, lookup env x)
 
     (*
@@ -80,7 +88,7 @@ let rec check (e : expr) (env : htype env) : expr =
         | V(h,e1) -> let (v1,m) = check e1 env 
                      let env2 = (h,m) :: env 
                      let (v2,q) = check e2 env2
-                     (Let(bind, (v2,q)), q)
+                     (Let(V(h,(v1,m)), (v2,q)), q)
                                
         //Not sure about this, #10 on rules
         | F(f,(x,t),fbody,fenv) -> let (hold, hd) = check fenv env
@@ -90,7 +98,8 @@ let rec check (e : expr) (env : htype env) : expr =
 
         
     | (Lam((x,q),y),z) ->
-        let (v1, t1) = check y env
+        let env2 = (x,q) :: env
+        let (v1, t1) = check y env2
         (Lam((x,q),(v1,t1)), ArrowT(q, t1))
         
 
@@ -98,7 +107,7 @@ let rec check (e : expr) (env : htype env) : expr =
         let (v1,z1) = check e2 env
         let (v2,ArrowT(m,n)) = check e1 env
         match z1 with
-           | m -> (Call( (v1,z1) , (v2,ArrowT(m,n)) ),m)
+           | m -> (Call( (v2,ArrowT(m,n)) , (v1,z1) ),m)
            | _ -> failwith "Mismatched call types"
         
 
