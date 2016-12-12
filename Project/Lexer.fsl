@@ -27,6 +27,7 @@ let keyword s =
 	| "fn" -> FN
 	| "fun"   -> FUN
 	| "hd" -> HD
+	| "tl" -> TL
 	| "if" -> IF
 	| "in" -> IN
 	| "int" -> INT
