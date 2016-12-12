@@ -123,7 +123,9 @@ end
 check ex1
 
 run ex1
-//TEST
+
+
+//NOT TYPECHECKING
 let ex1 = fromString "
 local 
   fun add (x:int) = fn (y:int) => x + y end
