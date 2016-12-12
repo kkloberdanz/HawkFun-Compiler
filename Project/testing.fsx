@@ -45,7 +45,6 @@ let run = Inter.run
 //let crun e = run (check e)
 
 
-//NOT TYPECHECKINNG
 let ex4 = fromString "
 local
   fun compose (f:int -> int) = fn (g:int -> int) => fn (x:int) => f (g x) end end
@@ -87,7 +86,7 @@ check tester
 run tester
 
 
-//check type with this, also doesn't interpret
+//doesn't interpret
 let holld = fromString "
   local fun rec f (x:int) : bool = f (x - 1) in f 2 end
 "
@@ -124,17 +123,17 @@ check ex1
 
 run ex1
 
-
-//NOT TYPECHECKING
 let ex1 = fromString "
 local 
   fun add (x:int) = fn (y:int) => x + y end
 in
-  add 3 4
+    3 + 4
 end
 "
 
 check ex1
+
+run ex1
 
 let ex1 = fromString "
   1 :: (1 + 2) :: ([]:int list)
@@ -145,7 +144,7 @@ check ex1
 run ex1
 
 
-//Interpretor can't find variable x
+//Interpretor can't find variable x, not typechecking either
 let ex1 = fromString "
 local 
   fun add (x:int) = fn (y:int) => x + y end
@@ -211,8 +210,6 @@ check ex3
 
 run ex3
 
-
-//Doesn't typecheck
 let ex4 = fromString "
 local
   fun compose (f:int -> int) = fn (g:int -> int) => fn (x:int) => f (g x) end end
@@ -228,7 +225,7 @@ check ex4
 run ex4
 
 
-//Check Interpretor for this, and typechecker TEST HEY
+//Doesn't Interpret
 let ex = fromString "
 local
   fun rec fib (n:int) : int =

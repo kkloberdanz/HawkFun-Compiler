@@ -102,11 +102,11 @@ let rec typeCheck (e : expr) (env : htype env) : expr =
                      (Let(V(h,(v1,m)), (v2,q)), q)
                                
         //Not sure about this, #10 on rules
-        | F(f,(x,t),fbody,fenv) -> let env2 = (x,t) :: env
+        | F(f,(x,t),fbody,fenv) -> let env2 = (f, ArrowT(t,fbody)) :: (x,t) :: env
                                    let (hold, hd) = typeCheck fenv env2 in
-                                   let env3 = (f, hd) :: env2 in
-                                   let (v2,q) = typeCheck e2 env3 in
-                                   (Let(bind, (v2,q)), q)
+                                   
+                                   let (v2,q) = typeCheck e2 env2 in
+                                   (Let(F(f,(x,t),fbody,(hold, hd)), (v2,q)), q)
 
         
     | (Lam((x,q),y),z) ->
@@ -118,14 +118,14 @@ let rec typeCheck (e : expr) (env : htype env) : expr =
     //Need to fix
     | (Call(e1,e2),k) ->
         let (v1,z1) = typeCheck e2 env
-        let (q1, t1) = typeCheck e1 env
+        (*let (q1, t1) = typeCheck e1 env
         match t1 with
             | ArrowT(m,n) -> if z1 = m then (Call( (q1, t1) , (v1,z1) ),m) else failwith "mismatched types, Call not Arrow"
-            | _ -> failwith "Mismatched Call Types"
-        (*let (v2,ArrowT(m,n)) = check e1 env
+            | _ -> failwith "Mismatched Call Types"*)
+        let (v2,ArrowT(m,n)) = typeCheck e1 env //Error, the match cases were incomplete
         match z1 with
            | m -> (Call( (v2,ArrowT(m,n)) , (v1,z1) ),m)
-           | _ -> failwith "Mismatched call types"*)
+           | _ -> failwith "Mismatched call types"
         
 
 
