@@ -58,6 +58,8 @@ end
 
 check ex4
 
+run ex4
+
 let ex = fromString "
   local var x = false in 2 * x end
 "
@@ -73,7 +75,6 @@ run ex
 
 run tester
 
-run ex
 
 check (fromString "fn (x:int) => x end")
 
@@ -86,12 +87,15 @@ check tester
 run tester
 
 
-//check type with this
+//check type with this, also doesn't interpret
 let holld = fromString "
   local fun rec f (x:int) : bool = f (x - 1) in f 2 end
 "
 
 check holld
+
+run holld
+
 
 let ex = fromString "
   print ((1::2::3::([]:int list)) :: (4::3::([]:int list)) :: ([]:int list list))
@@ -101,11 +105,13 @@ check ex
 
 run ex
 
+
+//supposed to fail
 let ex1 = fromString "
 local 
   fun add (x:int) = 
   local 
-    fun addx (y:int) = x + true 
+    fun addx (y:int) = x + true
   in 
     addx
   end 
@@ -116,6 +122,7 @@ end
 
 check ex1
 
+run ex1
 //TEST
 let ex1 = fromString "
 local 
@@ -135,6 +142,8 @@ check ex1
 
 run ex1
 
+
+//Interpretor can't find variable x
 let ex1 = fromString "
 local 
   fun add (x:int) = fn (y:int) => x + y end
@@ -144,6 +153,8 @@ in
  x
 end
 "
+
+check ex1
 
 run ex1 
 
@@ -184,7 +195,7 @@ check ex2
 run ex2
 
 
-
+//why does this one work in type and inter???
 let ex3 = fromString "
 local 
   fun twice (f:int -> int) = fn (x:int) => f (f x) end
@@ -198,6 +209,8 @@ check ex3
 
 run ex3
 
+
+//Doesn't typecheck
 let ex4 = fromString "
 local
   fun compose (f:int -> int) = fn (g:int -> int) => fn (x:int) => f (g x) end end
@@ -208,10 +221,12 @@ in
 end 
 "
 
+check ex4
+
 run ex4
 
 
-//Check Interpretor for this
+//Check Interpretor for this, and typechecker TEST HEY
 let ex = fromString "
 local
   fun rec fib (n:int) : int =
@@ -239,8 +254,6 @@ let ex = fromString "
 4 ; true
 "
 
-
-//Parser not correct here TESTTEST
 let ex = fromString "
 local
   var x = tl (4 :: 5 :: ([]:int list))
@@ -274,6 +287,8 @@ in
   x
 end
 "
+check ex
+run ex
 
 let ex = fromString "
 (false :: ([]:bool)) :: ([]:bool list list)
@@ -288,7 +303,6 @@ let ex = fromString "
 check ex
 
 
-//Doesn't interpret right
 let ex = fromString "
 local
   var e = ([]:bool list)
@@ -305,6 +319,8 @@ check ex
 
 run ex
 
+
+//Both type and Inter not working
 let ex = fromString "
 local
   fun rec map (f: int -> int) : (int list -> int list) = 

@@ -102,9 +102,10 @@ let rec typeCheck (e : expr) (env : htype env) : expr =
                      (Let(V(h,(v1,m)), (v2,q)), q)
                                
         //Not sure about this, #10 on rules
-        | F(f,(x,t),fbody,fenv) -> let (hold, hd) = typeCheck fenv env in
-                                   let env2 = (x,t) :: (f, hd) :: env in
-                                   let (v2,q) = typeCheck e2 env2 in
+        | F(f,(x,t),fbody,fenv) -> let env2 = (x,t) :: env
+                                   let (hold, hd) = typeCheck fenv env2 in
+                                   let env3 = (f, hd) :: env2 in
+                                   let (v2,q) = typeCheck e2 env3 in
                                    (Let(bind, (v2,q)), q)
 
         
