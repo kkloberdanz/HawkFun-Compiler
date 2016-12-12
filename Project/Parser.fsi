@@ -20,6 +20,7 @@ type token =
   | TL
   | LAM
   | ARROW
+  | TYPEAR
   | BOOL
   | ELSE
   | END
@@ -65,6 +66,7 @@ type tokenId =
     | TOKEN_TL
     | TOKEN_LAM
     | TOKEN_ARROW
+    | TOKEN_TYPEAR
     | TOKEN_BOOL
     | TOKEN_ELSE
     | TOKEN_END

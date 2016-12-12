@@ -22,6 +22,7 @@ let e5 = (Let (V ("x", (Con 0, BoolT)) ,(Op2 ("*", (Con 2, IntT), (Var "x", AnyT
 
 let e6 = (Let (V ("f", (Lam (("x", IntT), (Var "x", IntT)), AnyT)), (Call ((Var "f", AnyT), (Con 1, IntT)), AnyT)), AnyT)
 
+let e8 = (Let (V ("x",(Con 0, BoolT)),(Op2 ("*",(Con 2, IntT),(Var "x", AnyT)), AnyT)), AnyT) //shouldn't work, it doesn't... but it does when using testing
 
 
 
@@ -32,7 +33,7 @@ check e4 []
 check e5 []
 check e6 []*)
 
-let rec check (e : expr) (env : htype env) : expr =
+let rec typeCheck (e : expr) (env : htype env) : expr =
     match e with
     | (Con 0, BoolT) -> (Con 0, BoolT)
     | (Con 1, BoolT) -> (Con 1, BoolT)
@@ -58,7 +59,7 @@ let rec check (e : expr) (env : htype env) : expr =
 
     
     | (Op1(op, e1),x) ->
-        let (v1,t) = check e1 env
+        let (v1,t) = typeCheck e1 env
         match(op, t) with
         | ("not", BoolT ) -> (Op1(op, (v1,t)),BoolT)
         | ("ise", ListT j ) -> (Op1(op, (v1,t)), BoolT)
@@ -68,8 +69,8 @@ let rec check (e : expr) (env : htype env) : expr =
         | _ -> failwith "unknown primitive or wrong type"
 
     | (Op2(op, e1, e2),x) ->
-       let (v1, h) = check e1 env
-       let (v2,j) = check e2 env
+       let (v1, h) = typeCheck e1 env
+       let (v2,j) = typeCheck e2 env
        match(op, h, j) with
           | ("::", h, ListT q) -> if h=q then (Op2(op, (v1,h), (v2,j)), ListT h) else failwith "Mismatched types"
           | (";", h, j) -> (Op2(op, (v1,h), (v2,j)), j)
@@ -84,48 +85,53 @@ let rec check (e : expr) (env : htype env) : expr =
           | _ -> failwith "unknown primitive or wrong type"
 
     | (If (e1, e2, e3),x) -> 
-        let (v1,j) = check e1 env
-        let (v2,h) = check e2 env
-        let (v3,g) = check e3 env
+        let (v1,j) = typeCheck e1 env
+        let (v2,h) = typeCheck e2 env
+        let (v3,g) = typeCheck e3 env
         match j with
             | BoolT -> if h = g then (If ((v1,j), (v2,h), (v3,g)), h) else failwith "MisMatched types"
             | _ -> failwith "first expression not BoolT"
 
-(* Need to do rules 1,6,9,10,11,12 for typechecking, then done*)
+(* Look into this, something may not be working *)
     | (Let(bind, e2), j) ->
         //let (v2,q) = check e2 env
         match bind with
-        | V(h,e1) -> let (v1,m) = check e1 env 
-                     let env2 = (h,m) :: env 
-                     let (v2,q) = check e2 env2
+        | V(h,e1) -> let (v1,m) = typeCheck e1 env in
+                     let env2 = (h,m) :: env in
+                     let (v2,q) = typeCheck e2 env2 in
                      (Let(V(h,(v1,m)), (v2,q)), q)
                                
         //Not sure about this, #10 on rules
-        | F(f,(x,t),fbody,fenv) -> let (hold, hd) = check fenv env
-                                   let env2 = (f, hd) :: env
-                                   let (v2,q) = check e2 env2
+        | F(f,(x,t),fbody,fenv) -> let (hold, hd) = typeCheck fenv env in
+                                   let env2 = (x,t) :: (f, hd) :: env in
+                                   let (v2,q) = typeCheck e2 env2 in
                                    (Let(bind, (v2,q)), q)
 
         
     | (Lam((x,q),y),z) ->
         let env2 = (x,q) :: env
-        let (v1, t1) = check y env2
+        let (v1, t1) = typeCheck y env2
         (Lam((x,q),(v1,t1)), ArrowT(q, t1))
         
 
+    //Need to fix
     | (Call(e1,e2),k) ->
-        let (v1,z1) = check e2 env
-        let (v2,ArrowT(m,n)) = check e1 env
+        let (v1,z1) = typeCheck e2 env
+        let (q1, t1) = typeCheck e1 env
+        match t1 with
+            | ArrowT(m,n) -> if z1 = m then (Call( (q1, t1) , (v1,z1) ),m) else failwith "mismatched types, Call not Arrow"
+            | _ -> failwith "Mismatched Call Types"
+        (*let (v2,ArrowT(m,n)) = check e1 env
         match z1 with
            | m -> (Call( (v2,ArrowT(m,n)) , (v1,z1) ),m)
-           | _ -> failwith "Mismatched call types"
+           | _ -> failwith "Mismatched call types"*)
         
 
 
     | _ -> failwith "Holder Typecheckers"
 
 
-
+let check x = typeCheck x []
 
 
 

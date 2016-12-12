@@ -45,8 +45,19 @@ let run = Inter.run
 //let crun e = run (check e)
 
 
+//NOT TYPECHECKINNG
+let ex4 = fromString "
+local
+  fun compose (f:int -> int) = fn (g:int -> int) => fn (x:int) => f (g x) end end
+  fun inc (x:int) = x + 1
+  fun square (x:int) = x * x 
+in
+  compose inc square 3
+end 
+"
 
-//Something isn't checking in TypeChecker,need to look into
+check ex4
+
 let ex = fromString "
   local var x = false in 2 * x end
 "
@@ -54,27 +65,39 @@ let tester = fromString " ([]:int list)"
 
 check ex
 
+check (Let (V ("x",(Con 0, BoolT)),(Op2 ("*",(Con 2, IntT),(Var "x", AnyT)), AnyT)),AnyT)
+
+check tester
+
+run ex
+
+run tester
+
 run ex
 
 check (fromString "fn (x:int) => x end")
 
 check (fromString "local fun f (x:int) = x in (f 1) end")
+
 let tester = fromString "local var f = fn (x:int) => x end in (f 1) end"
 
 check tester
 
 run tester
 
-check (fromString "
-  local fun rec f (x:int) : bool = f (x - 1) in f 2 end
-")
 
+//check type with this
+let holld = fromString "
+  local fun rec f (x:int) : bool = f (x - 1) in f 2 end
+"
+
+check holld
 
 let ex = fromString "
   print ((1::2::3::([]:int list)) :: (4::3::([]:int list)) :: ([]:int list list))
 "
 
-let ex1 = check ex
+check ex
 
 run ex
 
@@ -93,6 +116,7 @@ end
 
 check ex1
 
+//TEST
 let ex1 = fromString "
 local 
   fun add (x:int) = fn (y:int) => x + y end
@@ -100,6 +124,8 @@ in
   add 3 4
 end
 "
+
+check ex1
 
 let ex1 = fromString "
   1 :: (1 + 2) :: ([]:int list)
@@ -153,6 +179,8 @@ let ex2 = fromString "
   (fn (y:int) => y + 1 end) 4
 "
 
+check ex2
+
 run ex2
 
 
@@ -170,9 +198,8 @@ check ex3
 
 run ex3
 
-
 let ex4 = fromString "
-local 
+local
   fun compose (f:int -> int) = fn (g:int -> int) => fn (x:int) => f (g x) end end
   fun inc (x:int) = x + 1
   fun square (x:int) = x * x 
@@ -183,6 +210,8 @@ end
 
 run ex4
 
+
+//Check Interpretor for this
 let ex = fromString "
 local
   fun rec fib (n:int) : int =
@@ -209,6 +238,8 @@ let ex = fromString "
 4 ; true
 "
 
+
+//Parser not correct here
 let ex = fromString "
 local
   var x = tl (4 :: 5 :: ([]:int))
@@ -216,6 +247,8 @@ in
   if x = ([]:int) then 10 else 11
 end
 "
+
+run ex
 
 let ex = fromString "
 local
@@ -247,6 +280,7 @@ let ex = fromString "
 check ex
 
 
+//Doesn't interpret right
 let ex = fromString "
 local
   var e = ([]:bool list)

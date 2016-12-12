@@ -64,7 +64,7 @@ let rec eval (e : expr) (env : value env) : value =
     | (Var x,_)  -> lookup env x
 
     | (Op1(op, e1),j) ->
-        let (c1, type1) = check e1 [] in //need this for print statement
+        let (c1, type1) = typeCheck e1 [] in //need this for print statement
         let v1 = eval e1 env in
         match(op, v1) with
         | ("not", Int i1) -> Int -i1
@@ -81,7 +81,7 @@ let rec eval (e : expr) (env : value env) : value =
        let v1 = eval e1 env in
        let v2 = eval e2 env in
        match(op,v1,v2) with
-          | ("::", Int i, List j) -> (List (Int i :: j))
+          | ("::", i , List j) -> (List ( i :: j))
           | (";", _, _) -> v2
           | ("*", Int i1, Int i2) -> Int (i1 * i2)
           | ("/", Int i1, Int i2) -> Int (i1 / i2)
