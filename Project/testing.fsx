@@ -221,6 +221,7 @@ in
 end
 "
 
+
 check ex
 
 run ex
@@ -239,14 +240,21 @@ let ex = fromString "
 "
 
 
-//Parser not correct here
+//Parser not correct here TESTTEST
 let ex = fromString "
 local
-  var x = tl (4 :: 5 :: ([]:int))
+  var x = tl (4 :: 5 :: ([]:int list))
 in
-  if x = ([]:int) then 10 else 11
+  if x = ([]:int list) then 10 else 11
 end
 "
+
+let ex2 = fromString " tl 1 :: (1 + 2) :: ([]:int list) " //works
+
+check ex2
+run ex2
+
+check ex
 
 run ex
 

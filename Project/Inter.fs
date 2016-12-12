@@ -64,18 +64,23 @@ let rec eval (e : expr) (env : value env) : value =
     | (Var x,_)  -> lookup env x
 
     | (Op1(op, e1),j) ->
-        let (c1, type1) = typeCheck e1 [] in //need this for print statement
+        //let (c1, type1) = typeCheck e1 [] //need this for print statement
         let v1 = eval e1 env in
         match(op, v1) with
         | ("not", Int i1) -> Int -i1
         | ("ise", List i1) -> if i1=[] then Int 1 else Int 0
-        | ("hd", List (h::t)) -> List [h]
-        | ("tl", List (h::t)) -> List t
-        | ("print", _) -> let hold = Printf.TextWriterFormat<unit>((toString v1 type1))
+        | ("hd", List j1 ) -> match j1 with
+                                | h::t -> List [h]
+                                | [] -> List []
+        | ("tl", List j1 ) -> match j1 with
+                                | h::t -> List t
+                                | [] -> List []
+        | ("print", _) -> let (c1, type1) = typeCheck e1 [] 
+                          let hold = Printf.TextWriterFormat<unit>((toString v1 type1))
                           printfn(hold) ; Int 0
                             //let f = Printf.TextWriterFormat<unit>((toString v1 type1)) printfn f
                             
-        | _ -> failwith "unknown primitive or wrong type"
+        | _ -> failwith "unknown primitive or wrong type for Op1"
         
     | (Op2(op, e1, e2),_) ->
        let v1 = eval e1 env in
@@ -87,11 +92,11 @@ let rec eval (e : expr) (env : value env) : value =
           | ("/", Int i1, Int i2) -> Int (i1 / i2)
           | ("+", Int i1, Int i2) -> Int (i1 + i2)
           | ("-", Int i1, Int i2) -> Int (i1 - i2)
-          | ("=", Int i1, Int i2) -> Int (if i1 = i2 then 1 else 0)
-          | ("<>", Int i1, Int i2) -> Int(if i1 = i2 then 0 else 1)
-          | ("<", Int i1, Int i2) -> Int (if i1 < i2 then 1 else 0)
-          | ("<=", Int i1, Int i2) -> Int(if i1 <= i2 then 1 else 0)
-          | _ -> failwith "unknown primitive or wrong type"
+          | ("=", i1, i2) -> Int (if i1 = i2 then 1 else 0)
+          | ("<>", i1, i2) -> Int(if i1 = i2 then 0 else 1)
+          | ("<", i1, i2) -> Int (if i1 < i2 then 1 else 0)
+          | ("<=", i1, i2) -> Int(if i1 <= i2 then 1 else 0)
+          | _ -> failwith "unknown primitive or wrong type for Op2"
 
     | (If (e1, e2, e3),_) -> 
       match eval e1 env with

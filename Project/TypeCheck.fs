@@ -63,7 +63,7 @@ let rec typeCheck (e : expr) (env : htype env) : expr =
         match(op, t) with
         | ("not", BoolT ) -> (Op1(op, (v1,t)),BoolT)
         | ("ise", ListT j ) -> (Op1(op, (v1,t)), BoolT)
-        | ("hd", ListT j ) -> (Op1(op, (v1,t)), j)
+        | ("hd", ListT j ) -> (Op1(op, (v1,t)), ListT j)
         | ("tl", ListT j ) -> (Op1(op, (v1,t)), ListT j) 
         | ("print", _ ) -> (Op1(op, (v1,t)), UnitT)
         | _ -> failwith "unknown primitive or wrong type"
@@ -72,7 +72,7 @@ let rec typeCheck (e : expr) (env : htype env) : expr =
        let (v1, h) = typeCheck e1 env
        let (v2,j) = typeCheck e2 env
        match(op, h, j) with
-          | ("::", h, ListT q) -> if h=q then (Op2(op, (v1,h), (v2,j)), ListT h) else failwith "Mismatched types"
+          | ("::", h, ListT q) -> if h=q then (Op2(op, (v1,h), (v2,j)), ListT q) else failwith "Mismatched types"
           | (";", h, j) -> (Op2(op, (v1,h), (v2,j)), j)
           | ("*", IntT, IntT) -> (Op2(op, (v1,h), (v2,j)), IntT)
           | ("/", IntT, IntT) -> (Op2(op, (v1,h), (v2,j)), IntT)
@@ -128,7 +128,7 @@ let rec typeCheck (e : expr) (env : htype env) : expr =
         
 
 
-    | _ -> failwith "Holder Typecheckers"
+    | _ -> failwith "Not an expression in HawkFun"
 
 
 let check x = typeCheck x []
