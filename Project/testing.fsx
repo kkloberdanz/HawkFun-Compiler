@@ -44,6 +44,84 @@ let eval = Inter.eval
 let run = Inter.run
 //let crun e = run (check e)
 
+//Things that aren't working
+
+//doesn't interpret
+let holld = fromString "
+  local fun rec f (x:int) : bool = f (x - 1) in f 2 end
+"
+
+check holld
+
+run holld
+
+//Interpretor can't find variable x, not typechecking either
+let ex1 = fromString "
+local 
+  fun add (x:int) = fn (y:int) => x + y end
+  var x = add 3 4
+in
+ (print x);
+ x
+end
+"
+
+check ex1
+
+run ex1 
+
+
+//Won't Typecheck
+let ex1 = fromString "
+local
+  var add = fn (x:int) => fn (y:int) => x + y end end
+in
+  add 3 4
+end
+"
+check ex1
+
+
+//Doesn't Interpret
+let ex = fromString "
+local
+  fun rec fib (n:int) : int =
+    if n = 0 then 1 else n * (fib (n - 1))
+in 
+  fib 4
+end
+"
+
+
+check ex
+
+run ex
+
+//Not typechecking
+let ex = fromString "
+(false :: ([]:bool)) :: ([]:bool list list)
+"
+check ex
+run ex
+
+//Both type and Inter not working
+let ex = fromString "
+local
+  fun rec map (f: int -> int) : (int list -> int list) = 
+    fn (l: int list) => 
+      if ise l then l else (f (hd l)) :: (map f (tl l)) end
+  fun flip (x:bool) = not x
+  var e = ([]:bool)
+in
+  map (fn (x:bool) => not x end) (true::false::e)
+end
+"
+
+check ex
+
+run ex
+
+//End of things that aren't working
 
 let ex4 = fromString "
 local
@@ -163,7 +241,7 @@ let ex2 = check ex1
 
 run ex2
 
-
+//Won't Typecheck
 let ex1 = fromString "
 local
   var add = fn (x:int) => fn (y:int) => x + y end end
@@ -171,7 +249,7 @@ in
   add 3 4
 end
 "
-
+check ex1
 run ex1
 
 
@@ -289,10 +367,11 @@ end
 check ex
 run ex
 
+//Not typechecking
 let ex = fromString "
 (false :: ([]:bool)) :: ([]:bool list list)
 "
-
+check ex
 run ex
 
 let ex = fromString "
