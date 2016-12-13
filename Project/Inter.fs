@@ -119,7 +119,7 @@ let rec eval (e : expr) (env : value env) : value =
         | V(str, v1) -> let v = eval v1 env in
                             let env2 = (str,v) :: env in
                                eval e1 env2
-        | F(f,(x,t),fbody,fenv) -> let env2 = (f, Closure(Some f,x,e1,env)) :: env in
+        | F(f,(x,t),ftype,fexp) ->  let env2 = (f, Closure(Some f,x,fexp, env)) :: env in printfn "env2: %A;\n e1 %A" env2 e1;
                                     eval e1 env2
 
     (*Need to go into office hours to see what Lam is supposed to do*)

@@ -26,14 +26,14 @@
 
 
 // Mac Os
-   #r "/Users/tinelli/Desktop/Project/bin/FsLexYacc.Runtime.dll"
+ (*  #r "/Users/tinelli/Desktop/Project/bin/FsLexYacc.Runtime.dll"
    #load "/Users/tinelli/Desktop/Project/Absyn.fs" 
    #load "/Users/tinelli/Desktop/Project/Parser.fs"
    #load "/Users/tinelli/Desktop/Project/Lexer.fs" 
    #load "/Users/tinelli/Desktop/Project/Parse.fs" 
    #load "/Users/tinelli/Desktop/Project/Env.fs" 
    #load "/Users/tinelli/Desktop/Project/TypeCheck.fs"
-   #load "/Users/tinelli/Desktop/Project/Inter.fs"
+   #load "/Users/tinelli/Desktop/Project/Inter.fs"*)
 
 
 open Absyn
