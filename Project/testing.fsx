@@ -46,15 +46,6 @@ let run = Inter.run
 
 //Things that aren't working
 
-//doesn't interpret
-let holld = fromString "
-  local fun rec f (x:int) : bool = f (x - 1) in f 2 end
-"
-
-check holld
-
-run holld
-
 //Interpretor can't find variable x, not typechecking either
 let ex1 = fromString "
 local 
@@ -79,23 +70,9 @@ in
   add 3 4
 end
 "
+
 check ex1
 
-
-//Doesn't Interpret
-let ex = fromString "
-local
-  fun rec fib (n:int) : int =
-    if n = 0 then 1 else n * (fib (n - 1))
-in 
-  fib 4
-end
-"
-
-
-check ex
-
-run ex
 
 //Not typechecking
 let ex = fromString "

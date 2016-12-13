@@ -40,7 +40,7 @@ let rec typeCheck (e : expr) (env : htype env) : expr =
     | (Con 0, UnitT) -> (Con 0, UnitT)
     | (Con i, IntT) -> (Con i, IntT)
     | (EListC, ListT x) -> (EListC, ListT x) //Idk if this is right
-    | (Var x, _) -> (Var x, lookup env x)
+    | (Var x, _) -> printfn "env %A" env ; (Var x, lookup env x)
 
     (*
     | (Var i, IntT) -> (Var i, IntT)
